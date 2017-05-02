@@ -3,7 +3,17 @@ class ApiController < ApplicationController
 	def index
 		if (params.has_key?(:units))
 			# puts params[:units].split(/([*\/\(\)])/).reject{ |c| c.empty?}
-			@name, @factor = get_unit_name(params[:units].split(/([\(*\/\)])/).reject{ |c| c.empty?})
+			param_list = params[:units].split(/([\(*\/\)])/).reject{ |c| c.empty?}
+			param_list.each_with_index{|element, index|
+				#Check to see if there is implicit multiplication 
+				next_element = param_list[index+1]
+				if not next_element.nil?
+					if not ["*", "(", "/", ")"].include? element and not ["*", ")", "/"].include? next_element
+						param_list.insert(index+1, "*")
+					end
+				end
+			}
+			@name, @factor = get_unit_name(param_list)
 			
 		else
 			@name = "N/A"
@@ -19,7 +29,7 @@ class ApiController < ApplicationController
 		string_factor = ""
 		array.each do |entry|
 			if (["*", "(", ")", "/"].include? entry)
-				#keep the key symbols
+				#keep the key symbols	
 				string_name += entry
 				# puts string_name
 				string_factor += entry
