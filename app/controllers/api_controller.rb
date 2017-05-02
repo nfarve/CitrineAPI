@@ -4,7 +4,6 @@ class ApiController < ApplicationController
 		if (params.has_key?(:units))
 			# puts params[:units].split(/([*\/\(\)])/).reject{ |c| c.empty?}
 			@name, @factor = get_unit_name(params[:units].split(/([\(*\/\)])/).reject{ |c| c.empty?})
-			# @factor = 3.144343434
 			
 		else
 			@name = "N/A"
@@ -20,6 +19,7 @@ class ApiController < ApplicationController
 		string_factor = ""
 		array.each do |entry|
 			if (["*", "(", ")", "/"].include? entry)
+				#keep the key symbols
 				string_name += entry
 				# puts string_name
 				string_factor += entry
@@ -32,6 +32,7 @@ class ApiController < ApplicationController
 					string_factor += result.last.factor.to_s
 					# puts string_factor
 				else
+					# if not a valid name or symbol
 					string_name = "N/A"
 					string_factor = "0"
 					return string_name, eval(string_factor).round(14)
